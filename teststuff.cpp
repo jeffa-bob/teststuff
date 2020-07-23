@@ -1,20 +1,75 @@
 // teststuff.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
+#include <Windows.h>
+#include <wincon.h>
+#include <tuple>
+#include <WinUser.h>
+#include <consoleapi.h>
+#include <cwchar>
 
-int main()
-{
-    std::cout << "Hello World!\n";
+using std::tuple;
+
+CONSOLE_FONT_INFOEX makefontsize(short x, short y) {
+				CONSOLE_FONT_INFOEX fontsize;
+				fontsize.cbSize = sizeof(fontsize);
+				fontsize.nFont = 0;
+				fontsize.dwFontSize.X = x;
+				fontsize.dwFontSize.Y = y;
+				fontsize.FontFamily = FF_DONTCARE;
+				fontsize.FontWeight = FW_NORMAL;
+				wcscpy_s(fontsize.FaceName, L"Consolas");
+				return fontsize;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
+COORD getrowcolumnlength() {
+				CONSOLE_SCREEN_BUFFER_INFO consolesize;
+				GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &consolesize);
+				return consolesize.dwSize;
+}
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+void changesize(int x, int y) {
+				HWND console = GetConsoleWindow();
+				RECT r;
+				GetWindowRect(console, &r); //stores the console's current dimensions
+				COORD g = { x,y };
+				//MoveWindow(window_handle, x, y, width, height, redraw_window);
+				MoveWindow(console, r.left, r.top, x, y, TRUE);
+				SetConsoleScreenBufferSize(console, g);
+}
+
+HANDLE makenewbuff(SECURITY_ATTRIBUTES* sectur) {
+				HANDLE consolescreen = CreateConsoleScreenBuffer(GENERIC_ALL, FILE_SHARE_WRITE, sectur, CONSOLE_TEXTMODE_BUFFER, NULL);
+				SetConsoleTitleA("3D");
+				SetConsoleMode(consolescreen, (DWORD)ENABLE_EXTENDED_FLAGS);
+				SetConsoleMode(consolescreen, (DWORD)ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+				SetConsoleMode(consolescreen, (DWORD)DISABLE_NEWLINE_AUTO_RETURN);
+				return consolescreen;
+}
+
+void preparescreenbuffer(tuple<short, short, short> pixels[600][800])
+{
+				SECURITY_ATTRIBUTES sectur;
+				sectur.bInheritHandle = true;
+				sectur.lpSecurityDescriptor = NULL;
+				sectur.nLength = sizeof(sectur);
+				HANDLE consolescreen = makenewbuff(&sectur);
+				SetConsoleActiveScreenBuffer(consolescreen);
+				HANDLE stdOUT = GetStdHandle(STD_OUTPUT_HANDLE);
+				auto fontsize = makefontsize((short)0, (short)1);
+				SetCurrentConsoleFontEx(stdOUT, FALSE, &fontsize);
+				changesize(800, 600);
+				COORD consolesize = getrowcolumnlength();
+				for (int i = 0; i < consolesize.Y; i++) {
+								DWORD x;
+								FillConsoleOutputCharacter(consolescreen,(TCHAR)219,(DWORD)consolesize.X,{(short)i,(short)0},&x);
+								//GetWindowRect(GetConsoleWindow(), &consolesize);
+								for (int j = 0; j < consolesize.X; j++) {
+												FillConsoleOutputAttribute(consolescreen,(WORD)FOREGROUND_BLUE,(DWORD)1,{(short)i,(short)j},&x);
+								 }
+				}
+}
+
+int main() {
+				tuple<short,short,short> pixels[600][800];
+}
