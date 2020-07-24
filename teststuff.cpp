@@ -9,6 +9,7 @@
 #include <WinUser.h>
 #include <consoleapi.h>
 #include <map>
+#include "readbmptoarray.h"
 #include <cwchar>
 
 using std::tuple;
@@ -76,12 +77,14 @@ HANDLE preparescreenbuffer(SECURITY_ATTRIBUTES *sectur)
 				for (int i = 0; i < (int)consolesize.Y; i++) {
 												//FillConsoleOutputCharacterA(consolescreen,219, (int)consolesize.Y*4, { (short)i,(short)0 }, &x);
 								for (int j = 0; j < (int)consolesize.X; j++) {
-												FillConsoleOutputCharacterA(consolescreen, darkness[2], 1, { (short)i,(short)j }, &x);
+												FillConsoleOutputCharacterA(consolescreen, darkness[0], 1, { (short)i,(short)j }, &x);
 												FillConsoleOutputAttribute(consolescreen,color[1]|color[2]|color[3]|FOREGROUND_INTENSITY,(DWORD)1,{(short)i,(short)j},&x);
 								 }
 				}
 				return consolescreen;
 }
+
+
 
 int main() {
 				SECURITY_ATTRIBUTES sectur;
