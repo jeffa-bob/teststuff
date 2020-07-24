@@ -43,7 +43,7 @@ void changesize(int x, int y) {
 }
 
 HANDLE makenewbuff(SECURITY_ATTRIBUTES* sectur) {
-				HANDLE consolescreen = CreateConsoleScreenBuffer(GENERIC_READ|GENERIC_WRITE, FILE_SHARE_WRITE, sectur, CONSOLE_TEXTMODE_BUFFER, NULL);
+				HANDLE consolescreen = GetStdHandle(STD_OUTPUT_HANDLE);
 				SetConsoleTitleA("3D");
 				SetConsoleMode(consolescreen, (DWORD)ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 				SetConsoleMode(consolescreen, (DWORD)DISABLE_NEWLINE_AUTO_RETURN);
@@ -66,15 +66,15 @@ HANDLE preparescreenbuffer(SECURITY_ATTRIBUTES *sectur)
 {			std::map<int,WORD> color = {{1,FOREGROUND_RED},{2,FOREGROUND_GREEN},{3,FOREGROUND_BLUE}};
 				HANDLE consolescreen = makenewbuff(sectur);
 				HANDLE stdOUT = GetStdHandle(STD_OUTPUT_HANDLE);
-				CONSOLE_FONT_INFOEX fontsize = makefontsize((short)0, (short)18);
+				CONSOLE_FONT_INFOEX fontsize = makefontsize((short)0, (short)1);
 				disablemouseinputbuff();
 				SetCurrentConsoleFontEx(stdOUT, FALSE, &fontsize);
 				changesize(600, 600);
 				COORD consolesize = getrowcolumnlength();
 				DWORD x;
-				for (int i = 0; i < (int)consolesize.Y; i++) {
-								for (int j = 0; j < (int)consolesize.X; j++) {
-												FillConsoleOutputCharacterA(consolescreen,219, (DWORD)600, { (short)i,(short)0 }, &x);
+				for (int i = 0; i < (int)consolesize.Y*16; i++) {
+												FillConsoleOutputCharacterA(consolescreen,219, (int)consolesize.Y*16, { (short)i,(short)0 }, &x);
+								for (int j = 0; j < (int)consolesize.X*16; j++) {
 												FillConsoleOutputAttribute(consolescreen,FOREGROUND_GREEN|FOREGROUND_INTENSITY,(DWORD)1,{(short)i,(short)j},&x);
 								 }
 				}
@@ -87,7 +87,6 @@ int main() {
 				sectur.lpSecurityDescriptor = NULL;
 				sectur.nLength = sizeof(sectur);
 				//tuple<short,short,short> pixels[600][800];
-				HANDLE nextconscrbuf = preparescreenbuffer(&sectur);
-				SetConsoleActiveScreenBuffer(nextconscrbuf);
+				preparescreenbuffer(&sectur);
 				while(true){}
 }
