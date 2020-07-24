@@ -142,10 +142,6 @@
     <ClCompile Include="teststuff.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bmpreader.h" />
-    <ClInclude Include="teststuff.h" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Google_Lens.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
