@@ -64,7 +64,6 @@ void disablemouseinputbuff() {
 
 HANDLE preparescreenbuffer(SECURITY_ATTRIBUTES *sectur)
 {			std::map<int,WORD> color = {{1,FOREGROUND_RED},{2,FOREGROUND_GREEN},{3,FOREGROUND_BLUE}};
-				std::map<int,int>  denisty = {{0,219},{1,178},{2,177},{3,176},{4,32}};
 				HANDLE consolescreen = makenewbuff(sectur);
 				HANDLE stdOUT = GetStdHandle(STD_OUTPUT_HANDLE);
 				CONSOLE_FONT_INFOEX fontsize = makefontsize((short)0, (short)18);
@@ -75,10 +74,9 @@ HANDLE preparescreenbuffer(SECURITY_ATTRIBUTES *sectur)
 				DWORD x;
 				for (int i = 0; i < (int)consolesize.Y; i++) {
 								for (int j = 0; j < (int)consolesize.X; j++) {
-												FillConsoleOutputCharacterA(consolescreen,denisty[0], (DWORD)1, { (short)i,(short)j }, &x);
+												FillConsoleOutputCharacterA(consolescreen,219, (DWORD)600, { (short)i,(short)0 }, &x);
 												FillConsoleOutputAttribute(consolescreen,FOREGROUND_GREEN|FOREGROUND_INTENSITY,(DWORD)1,{(short)i,(short)j},&x);
 								 }
-								wprintf(L"\n");
 				}
 				return consolescreen;
 }
@@ -88,8 +86,8 @@ int main() {
 				sectur.bInheritHandle = true;
 				sectur.lpSecurityDescriptor = NULL;
 				sectur.nLength = sizeof(sectur);
-				SetConsoleActiveScreenBuffer(makenewbuff(&sectur));
 				//tuple<short,short,short> pixels[600][800];
 				HANDLE nextconscrbuf = preparescreenbuffer(&sectur);
 				SetConsoleActiveScreenBuffer(nextconscrbuf);
+				while(true){}
 }
