@@ -1,11 +1,12 @@
 #include <vector>
+#include <array>
 
 namespace world{
     //3 floats that represent a point in 3d space
     struct _3dpos{
         float x,y,z;
     };
-    //2 _3dpos that represent a line in 3d space
+    //2 _3dpos that represent an infinite line in 3d space
     struct ray{
         _3dpos raypoint[2];
     };
@@ -90,9 +91,20 @@ namespace world{
         final.y /= current.mesh.size();
         final.z /= current.mesh.size();
     }
-    //class to be rendered onto screen
+    //class with list of objects to be rendered onto screen
     class currentworld {
-        std::vector<mesh,sphere>
-            
+        //vector of all of the meshes in the current world
+        std::vector<mesh> meshworld;
+        //vector of all of the spheres in the current world
+        std::vector<sphere> sphereworld;
+        //the camera with width, height(in pixels), field of view, and distance that rays can go
+        camera cam = {600,600,50,1.396263f};
+        //an array of pixels to display color to the screen
+        color** pixelarray = new color* [cam.height];
+        //builds the 2d pixel array of colors for displaying to the screen
+        void buildarray(color** &pixelarray){
+            for (int i = 0; i < cam.height; ++i)
+                pixelarray[i] = new color[cam.width];
+        }
     };
-}
+}   

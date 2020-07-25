@@ -11,6 +11,7 @@
 #include "readbmptoarray.h"
 #include <cwchar>
 
+
 CONSOLE_FONT_INFOEX makefontsize(short x, short y)
 {
 	CONSOLE_FONT_INFOEX fontsize;
@@ -66,32 +67,33 @@ void disablemouseinputbuff()
 
 HANDLE preparescreenbuffer(SECURITY_ATTRIBUTES *sectur)
 {
-	std::map<int, WORD> color = {{1, FOREGROUND_RED}, {2, FOREGROUND_GREEN}, {3, FOREGROUND_BLUE}};
+		std::map<int, WORD> colors = { {0,FOREGROUND_INTENSITY}, {1, FOREGROUND_RED}, {2, FOREGROUND_GREEN}, {3, FOREGROUND_BLUE} };
 	std::map<int, char> darkness = {{0, 219}, {1, 178}, {2, 177}, {3, 176}, {4, 32}};
 	HANDLE consolescreen = makenewbuff(sectur);
 	HANDLE stdOUT = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_FONT_INFOEX fontsize = makefontsize((short)0, (short)16);
+	CONSOLE_FONT_INFOEX fontsize = makefontsize((short)0, (short)1);
 	disablemouseinputbuff();
 	SetCurrentConsoleFontEx(stdOUT, FALSE, &fontsize);
 	changesize(600, 600);
 	COORD consolesize = getrowcolumnlength();
 	DWORD x;
-	image *curimage = loadimage("Google_Lens.bmp");
-	for (int i = 0; i < (int)consolesize.Y; ++i)
+	color **curimage = loadimage(".\mest.bmp");
+	for (int i = 0; i <= 600*600; ++i)
 	{
 		FillConsoleOutputCharacterA(consolescreen, 219, (int)consolesize.Y, {(short)i, (short)0}, &x);
-		for (int j = 0; j < (int)consolesize.X; ++j)
+		for (int j = 0; j <= 600*600; ++j)
 		{
-			if (curimage->data[i][j].blue == 0 && curimage->data[i][j].green == 0 && curimage->data[i][j].red == 0)
+			if (curimage[i][j].blue == 0 && curimage[i][j].green == 0 && curimage[i][j].red == 0)
 			{
 				FillConsoleOutputCharacterA(consolescreen, darkness[4], 1, {(short)i, (short)j}, &x);
 			}
 			else
-			{
-				FillConsoleOutputAttribute(consolescreen, color[1] | color[2] | color[3] | FOREGROUND_INTENSITY, (DWORD)1, {(short)i, (short)j}, &x);
+			{ 
+				FillConsoleOutputAttribute(consolescreen, colors[curimage[i][j].green] | colors[curimage[i][j].blue] | colors[curimage[i][j].red] | FOREGROUND_INTENSITY, (DWORD)1, {(short)i, (short)j}, &x);
 			}
 		}
 	}
+	delete curimage;
 	return consolescreen;
 }
 
