@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include <wincon.h>
 #include <stdio.h>
-#include <tuple>
 #include <tchar.h>
 #include <WinUser.h>
 #include <consoleapi.h>
@@ -103,7 +102,4 @@ int main()
 	sectur.lpSecurityDescriptor = NULL;
 	sectur.nLength = sizeof(sectur);
 	preparescreenbuffer(&sectur);
-	while (true)
-	{
-	}
 }

@@ -23,5 +23,8 @@
     <ClInclude Include="readbmptoarray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="3dworld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

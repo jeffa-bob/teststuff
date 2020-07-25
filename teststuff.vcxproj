@@ -142,6 +142,7 @@
     <ClCompile Include="teststuff.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="3dworld.h" />
     <ClInclude Include="readbmptoarray.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
