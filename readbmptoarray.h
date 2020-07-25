@@ -8,9 +8,9 @@ struct color {
 				unsigned char red;
 };
 
-struct image {
+ struct image {
 				char header[54];
-				color data[600][600];
+				color **data = new color*[600];
 };
 
 void threshold(image& Frame);
@@ -19,26 +19,29 @@ image* loadimage(std::string fileloca) {
 				std::ifstream input_image;
 				input_image.open(fileloca);
 				image Frame;
+				for (int i = 0; i < 600; ++i) {
+								Frame.data[i] = new color[600];
+				}
 				input_image.read((char*)&Frame, sizeof(Frame));
-				
+				threshold(Frame);
 				return &Frame;
 }
 
 void threshold(image& Frame) {
-				for (int i = 0; i < 480; ++i) {
-								for (int j = 0; j < 640; ++j) {
+				for (int i = 0; i < 600; ++i) {
+								for (int j = 0; j < 600; ++j) {
 												if (Frame.data[i][j].blue < 40)
 																Frame.data[i][j].blue = 0;
 												else
-																Frame.data[i][j].blue = 0xFF;
+																Frame.data[i][j].blue = 1;
 												if (Frame.data[i][j].green < 40)
 																Frame.data[i][j].green = 0;
 												else
-																Frame.data[i][j].green = 0xFF;
+																Frame.data[i][j].green = 1;
 												if (Frame.data[i][j].red < 40)
 																Frame.data[i][j].red = 0;
 												else
-																Frame.data[i][j].red = 0xFF;
+																Frame.data[i][j].red = 1;
 								}
 				}
 }

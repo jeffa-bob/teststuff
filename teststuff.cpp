@@ -12,8 +12,6 @@
 #include "readbmptoarray.h"
 #include <cwchar>
 
-using std::tuple;
-
 
 CONSOLE_FONT_INFOEX makefontsize(short x, short y) {
 				CONSOLE_FONT_INFOEX fontsize;
@@ -33,14 +31,14 @@ COORD getrowcolumnlength() {
 				return consolesize.dwSize;
 }
 
-void changesize(int x, int y) {
+void changesize(short x, short y) {
 				HWND console = GetConsoleWindow();
 				RECT r;
 				GetWindowRect(console, &r); //stores the console's current dimensions
 				COORD g = { x,y };
 				//MoveWindow(window_handle, x, y, width, height, redraw_window);
 				MoveWindow(console, r.left, r.top, x, y, TRUE);
-				SetConsoleScreenBufferSize(console, {(short)x-(short)2,(short)y});
+				SetConsoleScreenBufferSize(console, { (short)x - (short)2,(short)y });
 }
 
 HANDLE makenewbuff(SECURITY_ATTRIBUTES* sectur) {
@@ -48,7 +46,7 @@ HANDLE makenewbuff(SECURITY_ATTRIBUTES* sectur) {
 				SetConsoleTitleA("3D");
 				SetConsoleMode(consolescreen, (DWORD)ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 				SetConsoleMode(consolescreen, (DWORD)DISABLE_NEWLINE_AUTO_RETURN);
-    CONSOLE_CURSOR_INFO info;
+				CONSOLE_CURSOR_INFO info;
 				info.dwSize = 100;
 				info.bVisible = FALSE;
 				SetConsoleCursorInfo(consolescreen, &info);
@@ -63,9 +61,10 @@ void disablemouseinputbuff() {
 								(prev_mode & ~ENABLE_QUICK_EDIT_MODE));
 }
 
-HANDLE preparescreenbuffer(SECURITY_ATTRIBUTES *sectur)
-{			std::map<int,WORD> color = {{1,FOREGROUND_RED},{2,FOREGROUND_GREEN},{3,FOREGROUND_BLUE}};
-				std::map<int, char> darkness = {{0,219},{1,178},{2,177},{3,176}};
+HANDLE preparescreenbuffer(SECURITY_ATTRIBUTES* sectur)
+{
+				std::map<int, WORD> color = { {1,FOREGROUND_RED},{2,FOREGROUND_GREEN},{3,FOREGROUND_BLUE} };
+				std::map<int, char> darkness = { {0,219},{1,178},{2,177},{3,176},{4,32} };
 				HANDLE consolescreen = makenewbuff(sectur);
 				HANDLE stdOUT = GetStdHandle(STD_OUTPUT_HANDLE);
 				CONSOLE_FONT_INFOEX fontsize = makefontsize((short)0, (short)16);
@@ -74,24 +73,26 @@ HANDLE preparescreenbuffer(SECURITY_ATTRIBUTES *sectur)
 				changesize(600, 600);
 				COORD consolesize = getrowcolumnlength();
 				DWORD x;
-				for (int i = 0; i < (int)consolesize.Y; i++) {
-												//FillConsoleOutputCharacterA(consolescreen,219, (int)consolesize.Y*4, { (short)i,(short)0 }, &x);
-								for (int j = 0; j < (int)consolesize.X; j++) {
-												FillConsoleOutputCharacterA(consolescreen, darkness[0], 1, { (short)i,(short)j }, &x);
-												FillConsoleOutputAttribute(consolescreen,color[1]|color[2]|color[3]|FOREGROUND_INTENSITY,(DWORD)1,{(short)i,(short)j},&x);
-								 }
+				image* curimage = loadimage("Google_Lens.bmp");
+				for (int i = 0; i < (int)consolesize.Y; ++i) {
+								FillConsoleOutputCharacterA(consolescreen, 219, (int)consolesize.Y, { (short)i,(short)0 }, &x);
+								for (int j = 0; j < (int)consolesize.X; ++j) {
+												if (curimage->data[i][j].blue == 0 && curimage->data[i][j].green == 0 && curimage->data[i][j].red == 0) {
+																FillConsoleOutputCharacterA(consolescreen, darkness[4], 1, { (short)i,(short)j }, &x);
+											}
+												else {
+																FillConsoleOutputAttribute(consolescreen, color[1] | color[2] | color[3] | FOREGROUND_INTENSITY, (DWORD)1, { (short)i,(short)j }, &x);
+												}
+								}
 				}
 				return consolescreen;
 }
-
-
 
 int main() {
 				SECURITY_ATTRIBUTES sectur;
 				sectur.bInheritHandle = true;
 				sectur.lpSecurityDescriptor = NULL;
 				sectur.nLength = sizeof(sectur);
-				//tuple<short,short,short> pixels[600][800];
 				preparescreenbuffer(&sectur);
-				while(true){}
+				while (true) {}
 }
