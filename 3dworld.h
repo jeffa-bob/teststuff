@@ -61,9 +61,9 @@ namespace world
   };
 
   //sets first color to be average of both color
-  void mixcolor(color &col1, color col2)
+  void mixcolor(color& col1, color col2)
   {
-    col1 = {col1.r + col2.r / 2, col1.g + col2.g / 2, col1.b + col2.b / 2};
+    col1 = { col1.r + col2.r / 2, col1.g + col2.g / 2, col1.b + col2.b / 2 };
   };
 
   //returns true if both _3dpos are equal to each other
@@ -89,7 +89,7 @@ namespace world
   }
 
   //changes first paramenter to the sum of the first and second parameters
-  void add_3dpos(_3dpos &fir, _3dpos &sec)
+  void add_3dpos(_3dpos& fir, _3dpos& sec)
   {
     fir.x += sec.x;
     fir.y += sec.y;
@@ -97,7 +97,7 @@ namespace world
   }
 
   //changes first paramenter to the difference of the first and second parameters
-  void sub_3dpos(_3dpos &fir, _3dpos &sec)
+  void sub_3dpos(_3dpos& fir, _3dpos& sec)
   {
     fir.x -= sec.x;
     fir.y -= sec.y;
@@ -105,7 +105,7 @@ namespace world
   }
 
   //changes first paramenter to the product of the first and second parameters
-  void mul_3dpos(_3dpos &fir, _3dpos &sec)
+  void mul_3dpos(_3dpos& fir, _3dpos& sec)
   {
     fir.x *= sec.x;
     fir.y *= sec.y;
@@ -113,7 +113,7 @@ namespace world
   }
 
   //changes first paramenter to the quotient of the first and second parameters
-  void div_3dpos(_3dpos &fir, _3dpos &sec)
+  void div_3dpos(_3dpos& fir, _3dpos& sec)
   {
     fir.x /= sec.x;
     fir.y /= sec.y;
@@ -150,8 +150,20 @@ namespace world
     return x && y && z;
   }
 
-  //return the length of a ray in a float, decimal will be rounded
-  float distanceofaray(ray ray)
+  //gives unit vector of a ray as a ray from the first point of the ray
+  ray unitvectorofray(ray &rays) {
+    float magnitute = magnitudeofaray(rays);
+    return { {{rays.raypoint[0]},{rays.raypoint[1].x / magnitute,rays.raypoint[1].y / magnitute,rays.raypoint[1].z / magnitute}} };
+  }
+
+  //scales ray by unit vector of ray multiplied by magnitude; inplace
+  ray rayscaler(ray &rays, float mag) {
+    ray unitray = unitvectorofray(rays);
+    return { {{unitray.raypoint[0]},{unitray.raypoint[1].x * mag,unitray.raypoint[1].y * mag,unitray.raypoint[1].z * mag}} };
+  }
+
+  //return the magnitute of a ray in a float, decimal will be rounded
+  float magnitudeofaray(ray ray)
   {
     return (float)sqrt(pow(abs(ray.raypoint[0].x - ray.raypoint[1].x), 2) + pow(abs(ray.raypoint[0].y - ray.raypoint[1].y), 2) + pow(abs(ray.raypoint[0].z - ray.raypoint[1].z), 2));
   }
@@ -167,22 +179,22 @@ namespace world
     std::vector<sphere> sphereworld;
 
     //the camera with width, height(in pixels), field of view, and distance that rays can go
-    camera cam = {600, 600, {0, 0}, {{{0, 0, 0}, {0, 1, 0}}}, 1.396263f};
+    camera cam = { 600, 600, {0, 0}, {{{0, 0, 0}, {0, 1, 0}}}, 1.396263f };
 
     lightsource light;
     //an array of pixels to display color to the screen
-    color **pixelarray = new color *[cam.height];
-    ray **rayarray = new ray* [cam.height]
+    color** pixelarray = new color * [cam.height];
     //builds the 2d pixel array of colors for displaying to the screen
-    void buildarray(color **&pixelarray)
+    void buildarray()
     {
-      for (int i = 0; i < cam.height; ++i)
+      for (int i = 0; i < cam.height; ++i) {
         pixelarray[i] = new color[cam.width];
-        rayarray[i] = new ray[cam.width];
+      }
       for (int i = 0; i < cam.height; ++i)
       {
         for (int j = 0; i < cam.width; ++j)
         {
+          ray curray = { {{cam.pos},{0,cam.camdir.raypoint[1].y,0}} };
           pixelarray[i][j] = willraycollide();
         }
       }
@@ -191,32 +203,32 @@ namespace world
     //returns the color of the object the ray collides with else returns black;
     color willraycollide(ray rays)
     {
-      _3dpos increm = {rays.raypoint[1].x - rays.raypoint[0].x * 0.001, rays.raypoint[1].y - rays.raypoint[0].y * 0.001, rays.raypoint[1].z - rays.raypoint[0].z * 0.001};
+      _3dpos increm = { rays.raypoint[1].x - rays.raypoint[0].x * 0.001, rays.raypoint[1].y - rays.raypoint[0].y * 0.001, rays.raypoint[1].z - rays.raypoint[0].z * 0.001 };
       _3dpos i = rays.raypoint[0];
       while (!_3dposequal(i, rays.raypoint[1]))
       {
         add_3dpos(i, increm);
-        for (sphere &cursph : sphereworld)
+        for (sphere& cursph : sphereworld)
         {
           if (rayspherecollision(i, cursph))
           {
             ray coltolight;
             coltolight.raypoint[0] = i;
             coltolight.raypoint[1] = light.pos;
-            if (colorequal(willraycollide(coltolight), {0, 0, 0}))
+            if (colorequal(willraycollide(coltolight), { 0, 0, 0 }))
             {
               mixcolor(cursph.col, light.col);
               return cursph.col;
             }
             else
             {
-              mixcolor(cursph.col,{40,40,40})
+              mixcolor(cursph.col, { 40,40,40 });
               return cursph.col;
             }
           }
         }
       }
-      return {0, 0, 0};
+      return { 0, 0, 0 };
     }
   };
 }; // namespace world
