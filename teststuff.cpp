@@ -8,7 +8,7 @@
 #include <WinUser.h>
 #include <consoleapi.h>
 #include <map>
-#include "readbmptoarray.h"
+//#include "readbmptoarray.h"
 #include <cwchar>
 
 
@@ -77,23 +77,23 @@ HANDLE preparescreenbuffer(SECURITY_ATTRIBUTES *sectur)
 	changesize(600, 600);
 	COORD consolesize = getrowcolumnlength();
 	DWORD x;
-	color **curimage = loadimage(".\mest.bmp");
+	//color **curimage = loadimage(".\mest.bmp");
 	for (int i = 0; i <= 600*600; ++i)
 	{
 		FillConsoleOutputCharacterA(consolescreen, 219, (int)consolesize.Y, {(short)i, (short)0}, &x);
 		for (int j = 0; j <= 600*600; ++j)
 		{
-			if (curimage[i][j].blue == 0 && curimage[i][j].green == 0 && curimage[i][j].red == 0)
-			{
-				FillConsoleOutputCharacterA(consolescreen, darkness[4], 1, {(short)i, (short)j}, &x);
-			}
-			else
-			{ 
-				FillConsoleOutputAttribute(consolescreen, colors[curimage[i][j].green] | colors[curimage[i][j].blue] | colors[curimage[i][j].red] | FOREGROUND_INTENSITY, (DWORD)1, {(short)i, (short)j}, &x);
-			}
+			//if (curimage[i][j].blue == 0 && curimage[i][j].green == 0 && curimage[i][j].red == 0)
+			//{
+				//FillConsoleOutputCharacterA(consolescreen, darkness[4], 1, {(short)i, (short)j}, &x);
+			//}
+			//else
+			//{ 
+				FillConsoleOutputAttribute(consolescreen, FOREGROUND_GREEN | FOREGROUND_INTENSITY, (DWORD)1, {(short)i, (short)j}, &x);
+			//}
 		}
 	}
-	delete curimage;
+	//delete curimage;
 	return consolescreen;
 }
 
